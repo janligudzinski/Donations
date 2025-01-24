@@ -12,6 +12,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<LocationService>();
 builder.Services.AddScoped<SeedingService>();
+builder.Services.AddScoped<RegisterService>();
 
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

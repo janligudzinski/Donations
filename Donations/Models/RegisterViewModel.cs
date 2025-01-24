@@ -5,12 +5,6 @@ namespace Donations.Models;
 
 public class RegisterViewModel
 {
-    public string FullName { get; set; }
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public string ConfirmPassword { get; set; }
-    public string ContactInfo { get; set; }
-    // sorted dictionary to keep order
     public SortedDictionary<string, BloodType> BloodTypes { get; set; } = new()
     {
         ["AB+"] = BloodType.AbPositive,

@@ -1,5 +1,7 @@
 using Donations.Database;
 using Donations.Entities.Common;
+using Donations.Entities.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Donations.Services;
@@ -7,12 +9,44 @@ namespace Donations.Services;
 public class SeedingService
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly RoleManager<Role> _roleManager;
 
-    public SeedingService(ApplicationDbContext dbContext)
+    public SeedingService(ApplicationDbContext dbContext, RoleManager<Role> roleManager)
     {
         _dbContext = dbContext;
+        _roleManager = roleManager;
     }
 
+    private async Task SeedUserRoles()
+    {
+        var donorExists = await _roleManager.RoleExistsAsync(Roles.Donor);
+        var donationCenterExists = await _roleManager.RoleExistsAsync(Roles.DonationCenter);
+        if (!donorExists)
+        {
+            await _roleManager.CreateAsync(new Role
+            {
+                Name = Roles.Donor
+            });
+        }
+        
+        if (!donationCenterExists)
+        {
+            await _roleManager.CreateAsync(new Role
+            {
+                Name = Roles.DonationCenter
+            });
+        }
+        
+        if (!donorExists || !donationCenterExists)
+        {
+            Console.WriteLine("Roles seeded successfully");            
+        }
+        else
+        {
+            Console.WriteLine("Roles already exist");
+        }
+        
+    }
     private async Task SeedLocations()
     {
         var citiesAlreadyExist = await _dbContext.Locations.AnyAsync();
@@ -69,6 +103,7 @@ public class SeedingService
 
     public async Task Seed()
     {
+        await SeedUserRoles();
         await SeedLocations();
     }
 }
