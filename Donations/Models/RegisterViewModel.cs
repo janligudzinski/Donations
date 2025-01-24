@@ -22,15 +22,6 @@ public class RegisterViewModel
         ["B+"] = BloodType.BPositive,
         ["B-"] = BloodType.BNegative
     };
-
-    public List<Location> EligibleLocations =
-    [
-        new Location()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Amman",
-            Latitude = 1.0,
-            Longitude = 1.0
-        }
-    ];
+    // filled in by the controller
+    public List<Location> EligibleLocations { get; set; } = [];
 }

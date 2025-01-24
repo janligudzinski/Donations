@@ -1,5 +1,7 @@
+using System.Net.NetworkInformation;
 using Donations.Database;
 using Donations.Entities.User;
+using Donations.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<LocationService>();
+builder.Services.AddScoped<SeedingService>();
 
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -56,5 +61,12 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Seed the database with initial data
+using (var scope = app.Services.CreateScope())
+{
+    var userService = scope.ServiceProvider.GetRequiredService<SeedingService>();
+    await userService.Seed();
+}
 
 app.Run();
