@@ -1,10 +1,27 @@
 @model LoginViewModel
 
-@if (Model.IsDonationCenter)
-{
-    <h1>Sign in - Donation Center</h1>
-}
-else
-{
-    <h1>Sign in - Donor</h1>
-}
+
+<div class="text-center d-flex flex-column align-items-center">
+    <img src="~/img/logo.png" alt="Logo" class="mb-4" style="max-width: 300px;">
+    <h1>Sign in - @(Model.IsDonationCenter ? "Donation Center" : "Donor")</h1>
+    <form method="post" class="w-100" style="max-width: 400px;">
+        <div class="form-group mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+
+        <button type="submit" class="btn btn-danger w-100">Sign In</button>
+    </form>
+    @if (!Model.IsDonationCenter) // only show this to patients, we don't let just anyone register a hospital
+    {
+        <div class="text-center w-100 my-3" style="max-width: 400px;">
+            <p class="text-muted mb-3">Don't have an account yet?</p>
+            <a href="/Register" class="btn btn-danger px-4">Sign Up</a>
+        </div>
+    }
+</div>
