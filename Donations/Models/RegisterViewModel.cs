@@ -18,4 +18,5 @@ public class RegisterViewModel
     };
     // filled in by the controller
     public List<Location> EligibleLocations { get; set; } = [];
+    public string? ErrorMessage { get; set; }
 }

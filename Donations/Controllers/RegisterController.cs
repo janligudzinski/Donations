@@ -27,7 +27,17 @@ public class RegisterController : Controller
     [HttpPost]
     public async Task<IActionResult> Index(RegisterFormModel registerFormModel)
     {
-        var user = await _registerService.RegisterDonor(registerFormModel);
-        return RedirectToAction("Index", "Home");
+        try
+        {
+            var user = await _registerService.RegisterDonor(registerFormModel);
+            return View("Success");
+        } catch (Exception e)
+        {
+            return View("Index", new RegisterViewModel
+            {
+                EligibleLocations = await _locationService.GetAllLocations(),
+                ErrorMessage = e.Message
+            });
+        }
     }
 }

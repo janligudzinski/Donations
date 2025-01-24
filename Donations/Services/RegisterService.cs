@@ -26,12 +26,12 @@ public class RegisterService
             Email = registerFormModel.Email,
             UserName = registerFormModel.Email // we don't actually use this but it's required
         }, registerFormModel.Password);
-        
+
         if (!createResult.Succeeded)
         {
-            throw new Exception("User creation failed");
+            throw new Exception(string.Join(", ", createResult.Errors.Select(e => e.Description)));
         }
-        
+
         var user = await _userManager.FindByEmailAsync(registerFormModel.Email);
         await _userManager.AddToRoleAsync(user, Roles.Donor);
         
