@@ -119,10 +119,10 @@ public class SeedingService
         }
         Console.WriteLine("Seeding initial donation centers...");
         var amman = await _dbContext.Locations.SingleAsync(l => l.Name == "Amman");
-        _donationCenterService.CreateDonationCenter("khmc@khmc.jo", "khmcPassword", "King Hussein Medical Center",
+        await _donationCenterService.CreateDonationCenter("khmc@khmc.jo", "khmcPassword", "King Hussein Medical Center",
             amman);
         var zarqa = await _dbContext.Locations.SingleAsync(l => l.Name == "Zarqa");
-        _donationCenterService.CreateDonationCenter("hospital@zarqa.jo", "zarqaPassword", "Zarqa Hospital",
+        await _donationCenterService.CreateDonationCenter("hospital@zarqa.jo", "zarqaPassword", "Zarqa Hospital",
             zarqa);
         Console.WriteLine("Donation centers seeded successfully");
     }

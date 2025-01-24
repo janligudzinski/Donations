@@ -2,6 +2,7 @@ using Donations.Database;
 using Donations.Entities.Common;
 using Donations.Entities.User;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Donations.Services;
 
@@ -16,6 +17,12 @@ public class DonationCenterService
         _userManager = userManager;
     }
 
+    public async Task<List<DonationCenter>> GetAll()
+    {
+        return await _dbContext.DonationCenters
+            .ToListAsync();
+    }
+    
     public async Task CreateDonationCenter(string email, string password, string name, Location location)
     {
         var userCreateResult = await _userManager.CreateAsync(new User
