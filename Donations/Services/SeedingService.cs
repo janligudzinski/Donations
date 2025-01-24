@@ -10,11 +10,13 @@ public class SeedingService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly RoleManager<Role> _roleManager;
+    private readonly DonationCenterService _donationCenterService;
 
-    public SeedingService(ApplicationDbContext dbContext, RoleManager<Role> roleManager)
+    public SeedingService(ApplicationDbContext dbContext, RoleManager<Role> roleManager, DonationCenterService donationCenterService)
     {
         _dbContext = dbContext;
         _roleManager = roleManager;
+        _donationCenterService = donationCenterService;
     }
 
     private async Task SeedUserRoles()
@@ -47,6 +49,14 @@ public class SeedingService
         }
         
     }
+    
+    public async Task Seed()
+    {
+        await SeedUserRoles();
+        await SeedLocations();
+        await SeedDonationCenters();
+    }
+    
     private async Task SeedLocations()
     {
         var citiesAlreadyExist = await _dbContext.Locations.AnyAsync();
@@ -100,10 +110,20 @@ public class SeedingService
         Console.WriteLine("Locations seeded successfully");
     }
 
-
-    public async Task Seed()
+    private async Task SeedDonationCenters()
     {
-        await SeedUserRoles();
-        await SeedLocations();
+        var hospitalsAlreadyExist = await _dbContext.DonationCenters.AnyAsync();
+        if (hospitalsAlreadyExist)
+        {
+            return;
+        }
+        Console.WriteLine("Seeding initial donation centers...");
+        var amman = await _dbContext.Locations.SingleAsync(l => l.Name == "Amman");
+        _donationCenterService.CreateDonationCenter("khmc@khmc.jo", "khmcPassword", "King Hussein Medical Center",
+            amman);
+        var zarqa = await _dbContext.Locations.SingleAsync(l => l.Name == "Zarqa");
+        _donationCenterService.CreateDonationCenter("hospital@zarqa.jo", "zarqaPassword", "Zarqa Hospital",
+            zarqa);
+        Console.WriteLine("Donation centers seeded successfully");
     }
 }
