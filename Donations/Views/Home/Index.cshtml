@@ -1,12 +1,20 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
-<div class="text-center d-flex flex-column align-items-center">
-    <img src="~/img/logo.png" alt="Logo" class="mb-4" style="max-width: 300px;">
-
-    <div class="d-flex justify-content-evenly w-100" style="max-width: 400px;">
-        <a href="/Login?loginType=Donor" class="btn btn-danger px-4">User</a>
-        <a href="/Login?loginType=DonationCenter" class="btn btn-danger px-4">Hospital</a>
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="text-center d-flex flex-column align-items-center">
+        <h1>Welcome @User.Identity?.Name!</h1>
     </div>
-</div>
+}
+else
+{
+    <div class="text-center d-flex flex-column align-items-center">
+        <img src="~/img/logo.png" alt="Logo" class="mb-4" style="max-width: 300px;">
+
+        <div class="d-flex justify-content-evenly w-100" style="max-width: 400px;">
+            <a href="/Login?loginType=Donor" class="btn btn-danger px-4">User</a>
+            <a href="/Login?loginType=DonationCenter" class="btn btn-danger px-4">Hospital</a>
+        </div>
+    </div>
+}
