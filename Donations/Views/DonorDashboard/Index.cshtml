@@ -1,0 +1,8 @@
+@using Donations.Entities.Medical
+@model DonorDashboardViewModel
+
+<div class="text-center d-flex flex-column align-items-center">
+    <h1>Welcome @Model.Donor.User.FullName</h1>
+    <p>You're a donor from @Model.Donor.Location.Name, of blood type @Model.Donor.BloodType.ToHumanReadableString().</p>
+    <p>You have earned <b>@Model.Donor.Points</b> points for your donations so far.</p>
+</div>
