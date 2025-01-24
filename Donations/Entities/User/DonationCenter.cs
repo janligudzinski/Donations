@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Donations.Entities.User;
 
-public class Doctor
+public class DonationCenter
 {
     public Guid Id { get; set; }
     [ForeignKey("User")]
