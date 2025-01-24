@@ -1,4 +1,6 @@
 using Donations.Database;
+using Donations.Entities.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,28 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+// Add Identity services
+builder.Services.AddIdentity<User, Role>(options =>
+{
+    // Sane, simple password requirements
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+    
+    options.User.RequireUniqueEmail = true;
+    // We're not going to implement email or text confirmation for new accounts
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedPhoneNumber = false;
+})
+    .AddRoles<Role>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddScoped<UserManager<User>>();
+builder.Services.AddScoped<RoleManager<Role>>();
+
 
 var app = builder.Build();
 
