@@ -1,0 +1,50 @@
+@model RegisterViewModel
+
+<div class="text-center d-flex flex-column align-items-center">
+    <img src="~/img/logo.png" alt="Logo" class="mb-4" style="max-width: 300px;">
+    <h1>Sign up</h1>
+
+    <form method="post" class="w-100" style="max-width: 400px;">
+        <div class="form-group mb-3 text-start">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="fullName" name="fullName" required>
+        </div>
+
+        <div class="form-group mb-3 text-start">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+
+        <div class="form-group mb-3 text-start">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+
+        <div class="form-group mb-3 text-start">
+            <label for="bloodType" class="form-label">Blood Type</label>
+            <select class="form-control" id="bloodType" name="bloodType" required>
+                @foreach (var bloodType in Model.BloodTypes)
+                {
+                    <option value="@bloodType.Value">@bloodType.Key</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3 text-start">
+            <label for="location" class="form-label">Location</label>
+            <select class="form-control" id="location" name="location" required>
+                @foreach (var location in Model.EligibleLocations)
+                {
+                    <option value="@location.Id">@location.Name</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-danger btn-lg w-100 mb-4">Sign Up</button>
+    </form>
+
+    <div class="text-center w-100" style="max-width: 400px;">
+        <p class="text-muted mb-3">Have an account already?</p>
+        <a href="/Login" class="btn btn-danger px-4">Sign In</a>
+    </div>
+</div>
