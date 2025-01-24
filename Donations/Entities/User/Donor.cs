@@ -3,7 +3,7 @@ using Donations.Entities.Medical;
 
 namespace Donations.Entities.User;
 
-public class Patient
+public class Donor
 {
     public Guid Id { get; set; }
     [ForeignKey("User")]
