@@ -12,4 +12,5 @@ public class DonationCenter
     [ForeignKey("Location")]
     public Guid LocationId { get; set; }
     public virtual Location Location { get; set; }
+    public string Name { get; set; } = string.Empty;
 }
