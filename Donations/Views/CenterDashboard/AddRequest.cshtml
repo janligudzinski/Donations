@@ -1,0 +1,36 @@
+@using Donations.Entities.Medical
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model AddRequestFormModel
+
+<div class="text-center d-flex flex-column align-items-center">
+    <h1>Add Request</h1>
+    @if (ViewData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            @ViewData["ErrorMessage"]
+        </div>
+    }
+    <form method="post">
+        <div class="mb-3 text-start">
+            <label for="bloodTypes" class="form-label">Blood Types</label>
+            <select id="bloodTypes" name="bloodTypes" multiple class="form-select">
+                @foreach (var bloodType in Enum.GetValues<BloodType>())
+                {
+                    <option value="@bloodType"
+                            selected="@Model.BloodTypes.Contains(bloodType)">@bloodType.ToHumanReadableString()</option>
+                }
+            </select>
+        </div>
+        <div class="mb-3 text-start">
+            <label for="urgent" class="form-check-label">
+                <input type="checkbox" class="form-check-input" id="urgent" name="Urgent" checked="@Model.Urgent">
+                Urgent
+            </label>
+        </div>
+        <div class="mb-3 text-start">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" name="date" value="@Model.Date.ToString("yyyy-MM-dd")">
+        </div>
+        <button type="submit" class="btn btn-danger">Submit</button>
+    </form>
+</div>

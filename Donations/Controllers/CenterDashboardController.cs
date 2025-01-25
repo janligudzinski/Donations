@@ -11,9 +11,11 @@ namespace Donations.Controllers;
 public class CenterDashboardController : Controller
 {
     private readonly UserManager<User> _userManager;
-    public CenterDashboardController(UserManager<User> userManager)
+    private readonly DonationCenterService _donationCenterService;
+    public CenterDashboardController(UserManager<User> userManager, DonationCenterService donationCenterService)
     {
         _userManager = userManager;
+        _donationCenterService = donationCenterService;
     }
     public async Task<IActionResult> Index()
     {
@@ -24,5 +26,28 @@ public class CenterDashboardController : Controller
             DonationCenter = donationCenter
         };
         return View(model);
+    }
+
+    public IActionResult AddRequest()
+    {
+        return View(new AddRequestFormModel());
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> AddRequest(AddRequestFormModel model)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var donationCenter = user!.DonationCenter!;
+        try
+        {
+            await _donationCenterService.MakeRequest(donationCenter.Id, model.BloodTypes, model.Urgent, model.Date);
+            return RedirectToAction("Index");
+        } catch (Exception e)
+        {
+            ViewData["ErrorMessage"] = e.Message;
+            return View(model);
+        }
+
+        
     }
 }

@@ -1,5 +1,6 @@
 using Donations.Database;
 using Donations.Entities.Common;
+using Donations.Entities.Medical;
 using Donations.Entities.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,21 @@ public class DonationCenterService
     {
         return await _dbContext.DonationCenters
             .ToListAsync();
+    }
+    
+    public async Task MakeRequest(Guid donationCenterId, HashSet<BloodType> bloodTypes, bool urgent, DateTime date)
+    {
+        var donationCenter = await _dbContext.DonationCenters.SingleAsync(dc => dc.Id == donationCenterId);
+        var bloodRequest = new BloodRequest
+        {
+            BloodTypes = bloodTypes,
+            Date = date,
+            DonationCenter = donationCenter,
+            DonationCenterId = donationCenterId,
+            Urgent = urgent
+        };
+        _dbContext.BloodRequests.Add(bloodRequest);
+        await _dbContext.SaveChangesAsync();
     }
     
     public async Task CreateDonationCenter(string email, string password, string name, Location location)
