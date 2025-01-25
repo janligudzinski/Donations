@@ -13,6 +13,7 @@ public class BloodRequest
     public virtual DonationCenter DonationCenter { get; set; }
 
     public DateTime Date { get; set; } = DateTime.UtcNow;
+    public bool Urgent { get; set; }
 
     // Store blood types as a string of comma-separated values
     // This is because we want a HashSet so the types don't repeat, but we can't store a HashSet in a database directly without tricks like this or at the EF configuration level with a custom converter
