@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Donations.Entities.User;
 using Microsoft.AspNetCore.Mvc;
 using Donations.Models;
 
@@ -17,7 +18,15 @@ public class HomeController : Controller
     {
         if (User.Identity?.IsAuthenticated == true)
         {
-            return RedirectToAction("Index", "DonorDashboard");
+            if (User.IsInRole(Roles.DonationCenter))
+            {
+                return RedirectToAction("Index", "CenterDashboard");                
+            }
+            if (User.IsInRole(Roles.Donor))
+            {
+                return RedirectToAction("Index", "DonorDashboard");
+            }
+            throw new UnauthorizedAccessException("You are neither a donor nor a donation center. Contact an administator.");
         }
         
         return View();

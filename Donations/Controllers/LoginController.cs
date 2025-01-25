@@ -34,7 +34,7 @@ public class LoginController : Controller
                 Failed = true
             });
         }
-        return RedirectToAction("Index", "DonorDashboard");
+        return RedirectToAction("Index", "Home");
     }
 
     [HttpPost]
