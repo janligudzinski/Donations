@@ -1,4 +1,5 @@
 using Donations.Entities.Common;
+using Donations.Entities.Medical;
 using Donations.Entities.User;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Donor> Donors { get; set; }
     public DbSet<DonationCenter> DonationCenters { get; set; }
     public DbSet<Location> Locations { get; set; }
+    public DbSet<BloodRequest> BloodRequests { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -38,6 +40,18 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
         modelBuilder.Entity<User>().Navigation(d => d.DonationCenter).AutoInclude();
         modelBuilder.Entity<Donor>().Navigation(d => d.Location).AutoInclude();
         modelBuilder.Entity<DonationCenter>().Navigation(d => d.Location).AutoInclude();
+        #endregion
+
+        #region Blood Requests configuration
+        modelBuilder.Entity<DonationCenter>()
+            .HasMany(dc => dc.BloodRequests)
+            .WithOne(br => br.DonationCenter)
+            .HasForeignKey(br => br.DonationCenterId)
+            .OnDelete(DeleteBehavior.Cascade); // delete requests when the donation center is deleted
+
+        modelBuilder.Entity<BloodRequest>()
+            .Property(br => br.BloodTypesString)
+            .HasColumnName("BloodTypes"); // this is to keep the column name meaningful instead of an ugly BloodTypesString (a technical detail we don't need to leak)
         #endregion
     }
 }
