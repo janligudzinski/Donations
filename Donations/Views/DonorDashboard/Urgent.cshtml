@@ -1,0 +1,33 @@
+@using Donations.Entities.Medical
+@model BloodRequestsViewModel
+
+<div class="container">
+    <h1 class="mb-4">@Model.Title</h1>
+    <p class="text-muted mb-4">@Model.Description</p>
+
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            @foreach (var request in Model.Requests)
+            {
+                <div class="card mb-3 hover-shadow">
+                    <div class="card-body">
+                        <h5 class="card-title">@request.DonationCenter.Name</h5>
+                        <p class="card-text">
+                            <i class="bi bi-geo-alt"></i> @request.DonationCenter.Location.Name<br>
+                            <i class="bi bi-calendar-event"></i>@request.Date.ToString("d MMM yyyy")<br>
+                            <i class="bi bi-droplet"></i> Needed blood types: 
+                            @string.Join(", ", request.BloodTypes.Select(bt => bt.ToHumanReadableString()))<br>
+                        </p>
+                    </div>
+                </div>
+            }
+            
+            @if (!Model.Requests.Any())
+            {
+                <div class="text-center text-muted">
+                    <p>No urgent requests at the moment.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div> 

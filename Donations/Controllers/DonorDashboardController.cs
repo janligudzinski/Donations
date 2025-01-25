@@ -47,4 +47,54 @@ public class DonorDashboardController : Controller
             DonationCentersWithDistances = donationCentersWithDistances
         });
     }
+
+    public async Task<IActionResult> Urgent()
+    {
+        var requests = await _dbContext.BloodRequests
+            .Where(r => r.Urgent)
+            .Include(r => r.DonationCenter)
+            .ThenInclude(dc => dc.Location)
+            .OrderByDescending(r => r.Date)
+            .ToListAsync();
+
+        return View(new BloodRequestsViewModel
+        {
+            Requests = requests,
+            Title = "Urgent Blood Requests",
+            Description = "These requests need immediate attention."
+        });
+    }
+
+    public async Task<IActionResult> Available()
+    {
+        var requests = await _dbContext.BloodRequests
+            .Include(r => r.DonationCenter)
+            .ThenInclude(dc => dc.Location)
+            .OrderByDescending(r => r.Date)
+            .ToListAsync();
+
+        return View(new BloodRequestsViewModel
+        {
+            Requests = requests,
+            Title = "Available Blood Requests",
+            Description = "All current blood donation requests."
+        });
+    }
+
+    public async Task<IActionResult> Campaigns()
+    {
+        var requests = await _dbContext.BloodRequests
+            .Where(r => !r.Urgent)
+            .Include(r => r.DonationCenter)
+            .ThenInclude(dc => dc.Location)
+            .OrderByDescending(r => r.Date)
+            .ToListAsync();
+
+        return View(new BloodRequestsViewModel
+        {
+            Requests = requests,
+            Title = "Blood Donation Campaigns",
+            Description = "Ongoing blood donation campaigns."
+        });
+    }
 }
