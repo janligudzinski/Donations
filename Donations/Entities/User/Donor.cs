@@ -17,4 +17,5 @@ public class Donor
     public string ContactInfo { get; set; }
     public BloodType BloodType { get; set; }
     public int Points {get; set;}
+    public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 }

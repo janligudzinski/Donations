@@ -20,9 +20,36 @@
     </div>
     <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
-            <form method="post" action="/Requests/@Model.Request.Id/Apply">
-                <button type="submit" class="btn btn-danger btn-lg">Apply</button>
-            </form>
+            @if (!Model.UserHasApplied)
+            {
+                <form method="post" action="/Requests/@Model.Request.Id/Apply">
+                    <button type="submit" class="btn btn-danger btn-lg">Apply</button>
+                </form>
+            }
+            else
+            {
+                <button type="button" class="btn btn-danger btn-lg" disabled>Pending</button>
+            }
         </div>
     </div>
+    @if (Model.ShowAppliedModal)
+    {
+        // we "fake" a real closeable modal by just making the close button link us back to the base page
+        <div class="modal show d-block" id="appliedModal" tabindex="-1" aria-labelledby="appliedModalLabel">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="appliedModalLabel">Appointment Successful</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>We will notify you once your appointment is accepted or rejected.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="/Requests/@Model.Request.Id" class="btn btn-danger">Close</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop show"></div>
+    }
 </div>
