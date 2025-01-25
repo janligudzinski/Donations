@@ -1,0 +1,28 @@
+@using Donations.Entities.Medical
+@model RequestViewModel
+
+<div class="container">
+    <h1 class="mb-4">@Model.Request.DonationCenter.Name Request</h1>
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <div class="card mb-3 hover-shadow">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.Request.DonationCenter.Name</h5>
+                    <p class="card-text">
+                        <i class="bi bi-geo-alt"></i> @Model.Request.DonationCenter.Location.Name<br>
+                        <i class="bi bi-calendar-event"></i>@Model.Request.Date.ToString("d MMM yyyy")<br>
+                        <i class="bi bi-droplet"></i> Needed blood types:
+                        @string.Join(", ", Model.Request.BloodTypes.Select(bt => bt.ToHumanReadableString()))<br>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-lg-8 mx-auto">
+            <form method="post" action="/Requests/@Model.Request.Id/Apply">
+                <button type="submit" class="btn btn-danger btn-lg">Apply</button>
+            </form>
+        </div>
+    </div>
+</div>
