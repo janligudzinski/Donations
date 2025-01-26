@@ -47,7 +47,7 @@ public class RequestsController : Controller
         {
             BloodRequestId = request.Id,
             DonorId = donor.Id,
-            Request = request,
+            BloodRequest = request,
             State = AppointmentState.Pending
         };
         _dbContext.Appointments.Add(appointment);

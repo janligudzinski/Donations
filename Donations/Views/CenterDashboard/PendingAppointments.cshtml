@@ -1,0 +1,66 @@
+@model IEnumerable<PendingAppointmentViewModel>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Pending Appointments</h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Donor Name</th>
+                    <th>Location</th>
+                    <th>Donor Blood Type</th>
+                    <th>Requested Types</th>
+                    <th>Requested Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var request in Model)
+                {
+                    <tr>
+                        <td>@request.DonorName</td>
+                        <td>@request.DonorLocation</td>
+                        <td>@request.DonorBloodType</td>
+                        <td>@request.RequestedBloodTypes</td>
+                        <td>@request.RequestDate.ToShortDateString()</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <form asp-action="ApproveAppointment" method="post" style="display: inline;">
+                                    <input type="hidden" name="id" value="@request.Id" />
+                                    <button type="submit" class="btn btn-success rounded-circle"
+                                        style="width: 40px; height: 40px;">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form asp-action="RejectAppointment" method="post" style="display: inline;">
+                                    <input type="hidden" name="id" value="@request.Id" />
+                                    <button type="submit" class="btn btn-danger rounded-circle"
+                                        style="width: 40px; height: 40px;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function approveRequest(id) {
+            if (confirm('Are you sure you want to approve this appointment?')) {
+                window.location.href = `/CenterDashboard/ApproveAppointment/${id}`;
+            }
+        }
+
+        function rejectRequest(id) {
+            if (confirm('Are you sure you want to reject this appointment?')) {
+                window.location.href = `/CenterDashboard/RejectAppointment/${id}`;
+            }
+        }
+    </script>
+}

@@ -3,6 +3,13 @@
 <div class="text-center d-flex flex-column align-items-center">
     <h1>Welcome @Model.DonationCenter.Name - @Model.DonationCenter.Location.Name</h1>
     <h2>Dashboard</h2>
-    <a href="/CenterDashboard/AddRequest" class="btn btn-danger btn-lg">Add request</a>
-    <h2>Accept/reject appointments</h2>
+
+    <div class="d-flex flex-column gap-3">
+        <a href="/CenterDashboard/AddRequest" class="btn btn-danger btn-lg">
+            <i class="fas fa-plus-circle me-2"></i>Add request
+        </a>
+        <a href="/CenterDashboard/PendingAppointments" class="btn btn-danger btn-lg">
+            <i class="fas fa-clock me-2"></i>Manage appointments
+        </a>
+    </div>
 </div>
