@@ -23,22 +23,24 @@ public class DonationCenterService
         return await _dbContext.DonationCenters
             .ToListAsync();
     }
-    
-    public async Task MakeRequest(Guid donationCenterId, HashSet<BloodType> bloodTypes, bool urgent, DateTime date)
+
+    public async Task MakeRequest(Guid centerId, HashSet<BloodType> bloodTypes, UrgencyLevel urgencyLevel, DateTime date)
     {
-        var donationCenter = await _dbContext.DonationCenters.SingleAsync(dc => dc.Id == donationCenterId);
-        var bloodRequest = new BloodRequest
+        if (!bloodTypes.Any())
+            throw new Exception("At least one blood type must be selected");
+
+        var request = new BloodRequest
         {
+            DonationCenterId = centerId,
             BloodTypes = bloodTypes,
-            Date = date,
-            DonationCenter = donationCenter,
-            DonationCenterId = donationCenterId,
-            Urgent = urgent
+            UrgencyLevel = urgencyLevel,
+            Date = date
         };
-        _dbContext.BloodRequests.Add(bloodRequest);
+
+        _dbContext.BloodRequests.Add(request);
         await _dbContext.SaveChangesAsync();
     }
-    
+
     public async Task CreateDonationCenter(string email, string password, string name, Location location)
     {
         var userCreateResult = await _userManager.CreateAsync(new User
@@ -52,17 +54,17 @@ public class DonationCenterService
             throw new Exception("User creation for new donation center failed", new Exception(string.Join(", ", userCreateResult.Errors.Select(e => e.Description))));
         }
         var user = await _userManager.FindByEmailAsync(email);
-        
+
         await _userManager.AddToRoleAsync(user!, Roles.DonationCenter);
-        
-        
+
+
         var donationCenter = new DonationCenter
         {
             UserId = user!.Id,
             LocationId = location.Id,
             Name = name,
         };
-        
+
         await _dbContext.DonationCenters.AddAsync(donationCenter);
         await _dbContext.SaveChangesAsync();
     }

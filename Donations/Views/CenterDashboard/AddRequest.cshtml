@@ -16,16 +16,19 @@
             <select id="bloodTypes" name="bloodTypes" multiple class="form-select">
                 @foreach (var bloodType in Enum.GetValues<BloodType>())
                 {
-                    <option value="@bloodType"
-                            selected="@Model.BloodTypes.Contains(bloodType)">@bloodType.ToHumanReadableString()</option>
+                    <option value="@bloodType" selected="@Model.BloodTypes.Contains(bloodType)">
+                        @bloodType.ToHumanReadableString()</option>
                 }
             </select>
         </div>
         <div class="mb-3 text-start">
-            <label for="urgent" class="form-check-label">
-                <input type="checkbox" class="form-check-input" id="urgent" name="Urgent" checked="@Model.Urgent">
-                Urgent
-            </label>
+            <label for="urgencyLevel" class="form-label">Urgency Level</label>
+            <select id="urgencyLevel" name="UrgencyLevel" class="form-select">
+                @foreach (var level in Enum.GetValues<UrgencyLevel>())
+                {
+                    <option value="@level" selected="@(Model.UrgencyLevel == level)">@level</option>
+                }
+            </select>
         </div>
         <div class="mb-3 text-start">
             <label for="date" class="form-label">Date</label>

@@ -47,7 +47,7 @@ public class CenterDashboardController : Controller
         var donationCenter = user!.DonationCenter!;
         try
         {
-            await _donationCenterService.MakeRequest(donationCenter.Id, model.BloodTypes, model.Urgent, model.Date);
+            await _donationCenterService.MakeRequest(donationCenter.Id, model.BloodTypes, model.UrgencyLevel, model.Date);
             return RedirectToAction("Index");
         }
         catch (Exception e)
@@ -66,11 +66,11 @@ public class CenterDashboardController : Controller
             .Include(r => r.Donor)
                 .ThenInclude(d => d.Location)
             .Include(r => r.BloodRequest)
-            .Where(r => r.BloodRequest.DonationCenterId == currentUser.DonationCenter.Id
+            .Where(r => r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id
                     && r.State == AppointmentState.Pending)
             .Select(r => new PendingAppointmentViewModel
             {
-                Id = r.Id,
+                Id = r.BloodRequestId,
                 DonorName = r.Donor.User.FullName,
                 DonorLocation = r.Donor.Location.Name,
                 DonorBloodType = r.Donor.BloodType.ToHumanReadableString(),
@@ -90,7 +90,7 @@ public class CenterDashboardController : Controller
 
         var appointment = await _context.Appointments
             .Include(a => a.BloodRequest)
-            .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter.Id);
+            .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id);
 
         if (appointment == null) return NotFound();
 
@@ -108,7 +108,7 @@ public class CenterDashboardController : Controller
 
         var appointment = await _context.Appointments
             .Include(a => a.BloodRequest)
-            .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter.Id);
+            .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id);
 
         if (appointment == null) return NotFound();
 

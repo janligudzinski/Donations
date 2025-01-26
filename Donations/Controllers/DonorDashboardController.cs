@@ -1,5 +1,6 @@
 using Donations.Database;
 using Donations.Entities.Common;
+using Donations.Entities.Medical;
 using Donations.Entities.User;
 using Donations.Models;
 using Donations.Services;
@@ -47,54 +48,61 @@ public class DonorDashboardController : Controller
             DonationCentersWithDistances = donationCentersWithDistances
         });
     }
-    
+
     public async Task<IActionResult> Urgent()
     {
+        var user = await _userManager.GetUserAsync(User);
+        var donor = user!.Donor!;
         var requests = await _dbContext.BloodRequests
-            .Where(r => r.Urgent)
             .Include(r => r.DonationCenter)
-            .ThenInclude(dc => dc.Location)
-            .OrderByDescending(r => r.Date)
+                .ThenInclude(c => c.Location)
+            .Where(r => r.UrgencyLevel == UrgencyLevel.Urgent)
+            .OrderBy(r => r.Date)
             .ToListAsync();
 
         return View(new BloodRequestsViewModel
         {
-            Requests = requests,
-            Title = "Urgent Blood Requests",
-            Description = "These requests need immediate attention."
+            Title = "Urgent Requests",
+            Description = "These requests need immediate attention!",
+            Requests = requests
         });
     }
 
     public async Task<IActionResult> Available()
     {
+        var user = await _userManager.GetUserAsync(User);
+        var donor = user!.Donor!;
         var requests = await _dbContext.BloodRequests
             .Include(r => r.DonationCenter)
-            .ThenInclude(dc => dc.Location)
-            .OrderByDescending(r => r.Date)
+                .ThenInclude(c => c.Location)
+            .Where(r => r.UrgencyLevel == UrgencyLevel.Normal)
+            .OrderBy(r => r.Date)
             .ToListAsync();
 
         return View(new BloodRequestsViewModel
         {
-            Requests = requests,
-            Title = "Available Blood Requests",
-            Description = "All current blood donation requests."
+            Title = "Available Requests",
+            Description = "Current blood donation requests in your area",
+            Requests = requests
         });
     }
 
     public async Task<IActionResult> Campaigns()
     {
+        var user = await _userManager.GetUserAsync(User);
+        var donor = user!.Donor!;
         var requests = await _dbContext.BloodRequests
-            .Where(r => !r.Urgent)
             .Include(r => r.DonationCenter)
-            .ThenInclude(dc => dc.Location)
-            .OrderByDescending(r => r.Date)
+                .ThenInclude(c => c.Location)
+            .Where(r => r.UrgencyLevel == UrgencyLevel.Campaign)
+            .OrderBy(r => r.Date)
             .ToListAsync();
 
         return View(new BloodRequestsViewModel
         {
-            Requests = requests,
             Title = "Blood Donation Campaigns",
-            Description = "Ongoing blood donation campaigns."
+            Description = "Upcoming blood donation drives and campaigns",
+            Requests = requests
         });
     }
 }
