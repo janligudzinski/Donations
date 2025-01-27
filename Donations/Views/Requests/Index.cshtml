@@ -2,16 +2,26 @@
 @model RequestViewModel
 
 <div class="container">
-    <h1 class="mb-4">@Model.Request.DonationCenter.Name Request</h1>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="/DonorDashboard/@(Model.Request.UrgencyLevel switch { 
+            UrgencyLevel.Urgent => "Urgent",
+            UrgencyLevel.Campaign => "Campaigns",
+            _ => "Available"
+        })" class="text-danger text-decoration-none" aria-label="Back">
+            <i class="fas fa-arrow-left fa-lg"></i>
+            <span class="visually-hidden">Back</span>
+        </a>
+        <h1 class="mb-0">@Model.Request.DonationCenter.Name Request</h1>
+    </div>
     <div class="row">
         <div class="col-12 col-lg-8 mx-auto">
-            <div class="card mb-3 hover-shadow">
+            <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">@Model.Request.DonationCenter.Name</h5>
                     <p class="card-text">
-                        <i class="bi bi-geo-alt"></i> @Model.Request.DonationCenter.Location.Name<br>
-                        <i class="bi bi-calendar-event"></i>@Model.Request.Date.ToString("d MMM yyyy")<br>
-                        <i class="bi bi-droplet"></i> Needed blood types:
+                        <i class="fas fa-map-marker-alt"></i> @Model.Request.DonationCenter.Location.Name<br>
+                        <i class="fas fa-calendar"></i> @Model.Request.Date.ToString("d MMM yyyy")<br>
+                        <i class="fas fa-tint"></i> Needed blood types:
                         @string.Join(", ", Model.Request.BloodTypes.Select(bt => bt.ToHumanReadableString()))<br>
                     </p>
                 </div>
@@ -34,7 +44,6 @@
     </div>
     @if (Model.ShowAppliedModal)
     {
-        // we "fake" a real closeable modal by just making the close button link us back to the base page
         <div class="modal show d-block" id="appliedModal" tabindex="-1" aria-labelledby="appliedModalLabel">
             <div class="modal-dialog">
                 <div class="modal-content">

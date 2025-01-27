@@ -7,19 +7,22 @@
         <div class="col-12 col-lg-8 mx-auto">
             @foreach (var (center, distance) in Model.DonationCentersWithDistances)
             {
-                <a href="/Centers/@center.Id" class="text-decoration-none mb-3 d-block">
-                    <div class="card hover-shadow">
-                        <div class="card-body">
-                            <h5 class="card-title">@center.Name</h5>
-                            <p class="card-text">
-                                <i class="bi bi-geo-alt"></i> @center.Location.Name<br>
-                                <small class="text-muted">
-                                    <i class="bi bi-arrow-right-circle"></i> @(Math.Round(distance, 2)) km away
-                                </small>
-                            </p>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-hospital fa-2x text-danger"></i>
+                            <div>
+                                <h5 class="card-title mb-2">@center.Name</h5>
+                                <p class="card-text mb-0">
+                                    <i class="fas fa-map-marker-alt"></i> @center.Location.Name<br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-route"></i> @(Math.Round(distance, 2)) km away
+                                    </small>
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </a>
+                </div>
             }
         </div>
     </div>

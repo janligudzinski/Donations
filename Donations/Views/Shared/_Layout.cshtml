@@ -4,7 +4,9 @@
 @{
     var currentUser = await UserManager.GetUserAsync(User);
     var currentPath = Context.Request.Path.Value?.ToLower() ?? "";
-    var isTopLevelPage = currentPath == "/donordashboard/index" ||
+    var isTopLevelPage = currentPath == "/donordashboard" ||
+    currentPath == "/donordashboard/index" ||
+    currentPath == "/centerdashboard" ||
     currentPath == "/centerdashboard/index" ||
     currentPath == "/donordashboard/notifications" ||
     currentPath == "/donordashboard/profileoptions" ||

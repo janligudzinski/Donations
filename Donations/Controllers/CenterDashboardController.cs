@@ -91,7 +91,7 @@ public class CenterDashboardController : Controller
         if (currentUser == null) return Challenge();
 
         var appointment = await _context.Appointments
-            .Include(a => a.BloodRequest)
+            .Include(a => a.BloodRequest).ThenInclude(bloodRequest => bloodRequest.DonationCenter)
             .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id);
 
         if (appointment == null) return NotFound();
@@ -111,7 +111,7 @@ public class CenterDashboardController : Controller
         if (currentUser == null) return Challenge();
 
         var appointment = await _context.Appointments
-            .Include(a => a.BloodRequest)
+            .Include(a => a.BloodRequest).ThenInclude(bloodRequest => bloodRequest.DonationCenter)
             .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id);
 
         if (appointment == null) return NotFound();
