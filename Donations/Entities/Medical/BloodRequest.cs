@@ -29,4 +29,6 @@ public class BloodRequest
                 .ToHashSet();
         set => BloodTypesString = string.Join(",", value);
     }
+
+    public int TargetMilliliters { get; set; }
 }

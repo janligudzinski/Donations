@@ -47,11 +47,22 @@ public class CenterDashboardController : Controller
     [HttpPost]
     public async Task<IActionResult> AddRequest(AddRequestFormModel model)
     {
+        if (!model.BloodTypes.Any())
+        {
+            ModelState.AddModelError("BloodTypes", "Please select at least one blood type");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewData["ErrorMessage"] = "Please correct the errors and try again.";
+            return View(model);
+        }
+
         var user = await _userManager.GetUserAsync(User);
         var donationCenter = user!.DonationCenter!;
         try
         {
-            await _donationCenterService.MakeRequest(donationCenter.Id, model.BloodTypes, model.UrgencyLevel, model.Date);
+            await _donationCenterService.MakeRequest(donationCenter.Id, model.BloodTypes, model.UrgencyLevel, model.Date, model.TargetMilliliters);
             return RedirectToAction("Index");
         }
         catch (Exception e)

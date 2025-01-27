@@ -24,18 +24,27 @@ public class DonationCenterService
             .ToListAsync();
     }
 
-    public async Task MakeRequest(Guid centerId, HashSet<BloodType> bloodTypes, UrgencyLevel urgencyLevel, DateTime date)
+    public async Task MakeRequest(Guid centerId, HashSet<BloodType> bloodTypes, UrgencyLevel urgencyLevel, DateTime date, int targetMilliliters)
     {
-        if (!bloodTypes.Any())
-            throw new Exception("At least one blood type must be selected");
+        var center = await _dbContext.DonationCenters
+            .Include(dc => dc.BloodSupplies)
+            .SingleAsync(dc => dc.Id == centerId);
 
         var request = new BloodRequest
         {
             DonationCenterId = centerId,
             BloodTypes = bloodTypes,
             UrgencyLevel = urgencyLevel,
-            Date = date
+            Date = date,
+            TargetMilliliters = targetMilliliters
         };
+
+        // Update desired levels for each blood type
+        foreach (var bloodType in bloodTypes)
+        {
+            var supply = center.BloodSupplies.First(bs => bs.BloodType == bloodType);
+            supply.DesiredMilliliters += request.TargetMilliliters; // Increase desired level by the target amount
+        }
 
         _dbContext.BloodRequests.Add(request);
         await _dbContext.SaveChangesAsync();

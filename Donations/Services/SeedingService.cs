@@ -143,6 +143,7 @@ public class SeedingService
                     {
                         BloodType = bloodType,
                         MillilitersInStock = 0,
+                        DesiredMilliliters = 2000, // Initial desired level of 2 liters per type
                         DonationCenterId = center.Id
                     });
                 }
