@@ -2,7 +2,13 @@
 @model BloodRequestsViewModel
 
 <div class="container">
-    <h1 class="mb-4">@Model.Title</h1>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="/DonorDashboard/Index" class="text-danger text-decoration-none" aria-label="Back to Dashboard">
+            <i class="fas fa-arrow-left fa-lg"></i>
+            <span class="visually-hidden">Back to Dashboard</span>
+        </a>
+        <h1 class="mb-0">@Model.Title</h1>
+    </div>
     <p class="text-muted mb-4">@Model.Description</p>
 
     <div class="row">
@@ -27,9 +33,9 @@
             @if (!Model.Requests.Any())
             {
                 <div class="text-center text-muted">
-                    <p>No blood requests available at the moment.</p>
+                    <p>No available requests at the moment.</p>
                 </div>
             }
         </div>
     </div>
-</div> 
+</div>
