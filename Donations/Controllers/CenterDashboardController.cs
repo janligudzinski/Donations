@@ -16,12 +16,14 @@ public class CenterDashboardController : Controller
     private readonly ApplicationDbContext _context;
     private readonly UserManager<User> _userManager;
     private readonly DonationCenterService _donationCenterService;
+    private readonly NotificationService _notificationService;
 
-    public CenterDashboardController(ApplicationDbContext context, UserManager<User> userManager, DonationCenterService donationCenterService)
+    public CenterDashboardController(ApplicationDbContext context, UserManager<User> userManager, DonationCenterService donationCenterService, NotificationService notificationService)
     {
         _context = context;
         _userManager = userManager;
         _donationCenterService = donationCenterService;
+        _notificationService = notificationService;
     }
 
     public async Task<IActionResult> Index()
@@ -97,6 +99,8 @@ public class CenterDashboardController : Controller
         appointment.State = AppointmentState.Accepted;
         await _context.SaveChangesAsync();
 
+        await _notificationService.CreateNotification(appointment.DonorId, "Appointment accepted", $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been accepted");
+
         return RedirectToAction(nameof(PendingAppointments));
     }
 
@@ -114,6 +118,8 @@ public class CenterDashboardController : Controller
 
         appointment.State = AppointmentState.Rejected;
         await _context.SaveChangesAsync();
+
+        await _notificationService.CreateNotification(appointment.DonorId, "Appointment rejected", $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been declined");
 
         return RedirectToAction(nameof(PendingAppointments));
     }

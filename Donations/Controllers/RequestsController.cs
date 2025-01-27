@@ -2,6 +2,7 @@ using Donations.Database;
 using Donations.Entities.Medical;
 using Donations.Entities.User;
 using Donations.Models;
+using Donations.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,16 +14,19 @@ namespace Donations.Controllers;
 public class RequestsController : Controller
 {
     private readonly UserManager<User> _userManager;
+    private readonly NotificationService _notificationService;
     private readonly ApplicationDbContext _dbContext;
 
-    public RequestsController(ApplicationDbContext dbContext, UserManager<User> userManager)
+    public RequestsController(ApplicationDbContext dbContext, UserManager<User> userManager, NotificationService notificationService)
     {
         _dbContext = dbContext;
         _userManager = userManager;
+        _notificationService = notificationService;
     }
 
     [Route("Requests/{id}")]
-    public async Task<IActionResult> Index(Guid id) {
+    public async Task<IActionResult> Index(Guid id)
+    {
         var donor = (await _userManager.GetUserAsync(User))!.Donor!;
         var request = await _dbContext.BloodRequests.Include(r => r.DonationCenter)
             .ThenInclude(dc => dc.Location).SingleAsync(r => r.Id == id);
@@ -52,15 +56,17 @@ public class RequestsController : Controller
         };
         _dbContext.Appointments.Add(appointment);
         await _dbContext.SaveChangesAsync();
-        
+
         await _dbContext.SaveChangesAsync();
-        
+
         var viewModel = new RequestViewModel
         {
             Request = request,
             UserHasApplied = true,
             ShowAppliedModal = true
         };
+
+        await _notificationService.CreateNotification(donor.UserId, "Appointment application submitted", $"You have applied to {request.DonationCenter.Name} on {request.Date.ToShortDateString()}");
         return View("Index", viewModel);
     }
 }
