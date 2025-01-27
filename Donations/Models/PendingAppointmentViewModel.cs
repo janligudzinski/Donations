@@ -1,6 +1,6 @@
 public class PendingAppointmentViewModel
 {
-    public Guid Id { get; set; }
+    public Guid AppointmentId { get; set; }
     public string DonorName { get; set; }
     public string DonorLocation { get; set; }
     public string DonorBloodType { get; set; }

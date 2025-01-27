@@ -72,7 +72,7 @@ public class CenterDashboardController : Controller
                     && r.State == AppointmentState.Pending)
             .Select(r => new PendingAppointmentViewModel
             {
-                Id = r.BloodRequestId,
+                AppointmentId = r.Id,
                 DonorName = r.Donor.User.FullName,
                 DonorLocation = r.Donor.Location.Name,
                 DonorBloodType = r.Donor.BloodType.ToHumanReadableString(),
@@ -92,6 +92,7 @@ public class CenterDashboardController : Controller
 
         var appointment = await _context.Appointments
             .Include(a => a.BloodRequest).ThenInclude(bloodRequest => bloodRequest.DonationCenter)
+            .Include(appointment => appointment.Donor)
             .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id);
 
         if (appointment == null) return NotFound();
@@ -99,7 +100,7 @@ public class CenterDashboardController : Controller
         appointment.State = AppointmentState.Accepted;
         await _context.SaveChangesAsync();
 
-        await _notificationService.CreateNotification(appointment.DonorId, "Appointment accepted", $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been accepted");
+        await _notificationService.CreateNotification(appointment.Donor.UserId, "Appointment accepted", $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been accepted");
 
         return RedirectToAction(nameof(PendingAppointments));
     }
@@ -112,6 +113,7 @@ public class CenterDashboardController : Controller
 
         var appointment = await _context.Appointments
             .Include(a => a.BloodRequest).ThenInclude(bloodRequest => bloodRequest.DonationCenter)
+            .Include(appointment => appointment.Donor)
             .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id);
 
         if (appointment == null) return NotFound();
@@ -119,7 +121,7 @@ public class CenterDashboardController : Controller
         appointment.State = AppointmentState.Rejected;
         await _context.SaveChangesAsync();
 
-        await _notificationService.CreateNotification(appointment.DonorId, "Appointment rejected", $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been declined");
+        await _notificationService.CreateNotification(appointment.Donor.UserId, "Appointment rejected", $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been declined");
 
         return RedirectToAction(nameof(PendingAppointments));
     }

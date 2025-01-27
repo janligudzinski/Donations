@@ -2,8 +2,15 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model AddRequestFormModel
 
-<div class="text-center d-flex flex-column align-items-center">
-    <h1>Add Request</h1>
+<div class="container">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="/CenterDashboard/Index" class="text-danger text-decoration-none" aria-label="Back to Dashboard">
+            <i class="fas fa-arrow-left fa-lg"></i>
+            <span class="visually-hidden">Back to Dashboard</span>
+        </a>
+        <h1 class="mb-0">Add Request</h1>
+    </div>
+
     @if (ViewData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger" role="alert">
