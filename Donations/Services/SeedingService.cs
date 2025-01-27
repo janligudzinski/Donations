@@ -1,5 +1,6 @@
 using Donations.Database;
 using Donations.Entities.Common;
+using Donations.Entities.Medical;
 using Donations.Entities.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ public class SeedingService
                 Name = Roles.Donor
             });
         }
-        
+
         if (!donationCenterExists)
         {
             await _roleManager.CreateAsync(new Role
@@ -38,25 +39,26 @@ public class SeedingService
                 Name = Roles.DonationCenter
             });
         }
-        
+
         if (!donorExists || !donationCenterExists)
         {
-            Console.WriteLine("Roles seeded successfully");            
+            Console.WriteLine("Roles seeded successfully");
         }
         else
         {
             Console.WriteLine("Roles already exist");
         }
-        
+
     }
-    
+
     public async Task Seed()
     {
         await SeedUserRoles();
         await SeedLocations();
         await SeedDonationCenters();
+        await EnsureBloodSupplies();
     }
-    
+
     private async Task SeedLocations()
     {
         var citiesAlreadyExist = await _dbContext.Locations.AnyAsync();
@@ -125,5 +127,27 @@ public class SeedingService
         await _donationCenterService.CreateDonationCenter("hospital@zarqa.jo", "zarqaPassword", "Zarqa Hospital",
             zarqa);
         Console.WriteLine("Donation centers seeded successfully");
+    }
+
+    private async Task EnsureBloodSupplies()
+    {
+        var centers = await _dbContext.DonationCenters.Include(dc => dc.BloodSupplies).ToListAsync();
+        foreach (var center in centers)
+        {
+            var existingTypes = center.BloodSupplies.Select(bs => bs.BloodType).ToHashSet();
+            foreach (BloodType bloodType in Enum.GetValues<BloodType>())
+            {
+                if (!existingTypes.Contains(bloodType))
+                {
+                    center.BloodSupplies.Add(new BloodSupply
+                    {
+                        BloodType = bloodType,
+                        MillilitersInStock = 0,
+                        DonationCenterId = center.Id
+                    });
+                }
+            }
+        }
+        await _dbContext.SaveChangesAsync();
     }
 }

@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<BloodRequest> BloodRequests { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<BloodSupply> BloodSupplies { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
@@ -61,5 +62,15 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
             .OnDelete(DeleteBehavior.NoAction); // delete appointments when the request is deleted
 
         #endregion
+
+        modelBuilder.Entity<BloodSupply>()
+            .HasOne(bs => bs.DonationCenter)
+            .WithMany(dc => dc.BloodSupplies)
+            .HasForeignKey(bs => bs.DonationCenterId);
+
+        // Ensure each blood type only appears once per center
+        modelBuilder.Entity<BloodSupply>()
+            .HasIndex(bs => new { bs.DonationCenterId, bs.BloodType })
+            .IsUnique();
     }
 }

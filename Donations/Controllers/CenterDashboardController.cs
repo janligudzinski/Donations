@@ -153,6 +153,7 @@ public class CenterDashboardController : Controller
         var appointment = await _context.Appointments
             .Include(a => a.BloodRequest)
                 .ThenInclude(r => r.DonationCenter)
+                    .ThenInclude(dc => dc.BloodSupplies)
             .Include(a => a.Donor)
             .FirstOrDefaultAsync(r => r.Id == id &&
                 r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id &&
@@ -170,6 +171,11 @@ public class CenterDashboardController : Controller
             _ => 1.0
         };
         int pointsEarned = (int)(basePoints * multiplier);
+
+        // Update blood supply
+        var bloodSupply = appointment.BloodRequest.DonationCenter.BloodSupplies
+            .First(bs => bs.BloodType == appointment.Donor.BloodType);
+        bloodSupply.MillilitersInStock += 450;
 
         // Update appointment and donor
         appointment.State = AppointmentState.Complete;

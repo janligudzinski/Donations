@@ -16,4 +16,5 @@ public class DonationCenter
     public string Name { get; set; } = string.Empty;
 
     public virtual ICollection<BloodRequest> BloodRequests { get; set; } = new List<BloodRequest>();
+    public ICollection<BloodSupply> BloodSupplies { get; set; } = new List<BloodSupply>();
 }
