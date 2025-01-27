@@ -31,7 +31,9 @@ public class CenterDashboardController : Controller
     public async Task<IActionResult> Index()
     {
         var user = await _userManager.GetUserAsync(User);
-        var donationCenter = user!.DonationCenter!;
+        var donationCenter = await _context.DonationCenters
+            .Include(dc => dc.BloodSupplies)
+            .SingleAsync(dc => dc.Id == user!.DonationCenter!.Id);
         var model = new CenterDashboardViewModel
         {
             DonationCenter = donationCenter
