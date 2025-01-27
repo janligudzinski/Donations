@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Donations.Entities.Medical;
 using Donations.Entities.User;
+
+namespace Donations.Entities.Medical;
 
 public class BloodSupply
 {
@@ -8,6 +11,7 @@ public class BloodSupply
     public int MillilitersInStock { get; set; }
     public int DesiredMilliliters { get; set; }
 
+    [ForeignKey("DonationCenter")]
     public Guid DonationCenterId { get; set; }
     public DonationCenter DonationCenter { get; set; }
 

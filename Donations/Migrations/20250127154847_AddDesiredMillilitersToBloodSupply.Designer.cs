@@ -4,6 +4,7 @@ using Donations.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Donations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250127154847_AddDesiredMillilitersToBloodSupply")]
+    partial class AddDesiredMillilitersToBloodSupply
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,32 @@ namespace Donations.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BloodSupply", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("BloodType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DesiredMilliliters")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("DonationCenterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MillilitersInStock")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DonationCenterId", "BloodType")
+                        .IsUnique();
+
+                    b.ToTable("BloodSupplies");
+                });
 
             modelBuilder.Entity("Donations.Entities.Common.Location", b =>
                 {
@@ -95,32 +124,6 @@ namespace Donations.Migrations
                     b.HasIndex("DonationCenterId");
 
                     b.ToTable("BloodRequests");
-                });
-
-            modelBuilder.Entity("Donations.Entities.Medical.BloodSupply", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("BloodType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DesiredMilliliters")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("DonationCenterId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("MillilitersInStock")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DonationCenterId", "BloodType")
-                        .IsUnique();
-
-                    b.ToTable("BloodSupplies");
                 });
 
             modelBuilder.Entity("Donations.Entities.User.DonationCenter", b =>
@@ -412,6 +415,17 @@ namespace Donations.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BloodSupply", b =>
+                {
+                    b.HasOne("Donations.Entities.User.DonationCenter", "DonationCenter")
+                        .WithMany("BloodSupplies")
+                        .HasForeignKey("DonationCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DonationCenter");
+                });
+
             modelBuilder.Entity("Donations.Entities.Medical.Appointment", b =>
                 {
                     b.HasOne("Donations.Entities.Medical.BloodRequest", "BloodRequest")
@@ -437,17 +451,6 @@ namespace Donations.Migrations
                         .WithMany("BloodRequests")
                         .HasForeignKey("DonationCenterId")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("DonationCenter");
-                });
-
-            modelBuilder.Entity("Donations.Entities.Medical.BloodSupply", b =>
-                {
-                    b.HasOne("Donations.Entities.User.DonationCenter", "DonationCenter")
-                        .WithMany("BloodSupplies")
-                        .HasForeignKey("DonationCenterId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("DonationCenter");
