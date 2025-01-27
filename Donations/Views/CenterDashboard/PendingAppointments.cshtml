@@ -10,6 +10,13 @@
         <h1 class="mb-0">Appointments</h1>
     </div>
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger mb-4" role="alert">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     @if (!Model.Any())
     {
         <div class="text-center text-muted">

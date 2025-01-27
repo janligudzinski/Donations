@@ -16,27 +16,40 @@ public class RequestsController : Controller
     private readonly UserManager<User> _userManager;
     private readonly NotificationService _notificationService;
     private readonly ApplicationDbContext _dbContext;
+    private readonly DonorEligibilityService _donorEligibilityService;
 
-    public RequestsController(ApplicationDbContext dbContext, UserManager<User> userManager, NotificationService notificationService)
+    public RequestsController(ApplicationDbContext dbContext, UserManager<User> userManager, NotificationService notificationService, DonorEligibilityService donorEligibilityService)
     {
         _dbContext = dbContext;
         _userManager = userManager;
         _notificationService = notificationService;
+        _donorEligibilityService = donorEligibilityService;
     }
 
     [Route("Requests/{id}")]
     public async Task<IActionResult> Index(Guid id)
     {
         var donor = (await _userManager.GetUserAsync(User))!.Donor!;
-        var request = await _dbContext.BloodRequests.Include(r => r.DonationCenter)
-            .ThenInclude(dc => dc.Location).SingleAsync(r => r.Id == id);
+        var request = await _dbContext.BloodRequests
+            .Include(r => r.DonationCenter)
+                .ThenInclude(dc => dc.Location)
+            .SingleAsync(r => r.Id == id);
+
         var userHasApplied = await _dbContext.Appointments
-            .AnyAsync(a => a.BloodRequestId == request.Id && a.DonorId == donor.Id && a.State == AppointmentState.Pending);
+            .AnyAsync(a => a.BloodRequestId == request.Id &&
+                          a.DonorId == donor.Id &&
+                          a.State == AppointmentState.Pending);
+
+        var (canDonate, reason) = await _donorEligibilityService.CanDonateForRequest(donor.Id, request);
+
         var viewModel = new RequestViewModel
         {
             Request = request,
-            UserHasApplied = userHasApplied
+            UserHasApplied = userHasApplied,
+            CanDonate = canDonate,
+            IneligibilityReason = reason
         };
+
         return View(viewModel);
     }
 

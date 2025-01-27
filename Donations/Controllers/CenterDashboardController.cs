@@ -17,13 +17,15 @@ public class CenterDashboardController : Controller
     private readonly UserManager<User> _userManager;
     private readonly DonationCenterService _donationCenterService;
     private readonly NotificationService _notificationService;
+    private readonly DonorEligibilityService _donorEligibilityService;
 
-    public CenterDashboardController(ApplicationDbContext context, UserManager<User> userManager, DonationCenterService donationCenterService, NotificationService notificationService)
+    public CenterDashboardController(ApplicationDbContext context, UserManager<User> userManager, DonationCenterService donationCenterService, NotificationService notificationService, DonorEligibilityService donorEligibilityService)
     {
         _context = context;
         _userManager = userManager;
         _donationCenterService = donationCenterService;
         _notificationService = notificationService;
+        _donorEligibilityService = donorEligibilityService;
     }
 
     public async Task<IActionResult> Index()
@@ -94,16 +96,29 @@ public class CenterDashboardController : Controller
         if (currentUser == null) return Challenge();
 
         var appointment = await _context.Appointments
-            .Include(a => a.BloodRequest).ThenInclude(bloodRequest => bloodRequest.DonationCenter)
-            .Include(appointment => appointment.Donor)
-            .FirstOrDefaultAsync(r => r.Id == id && r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id);
+            .Include(a => a.BloodRequest)
+                .ThenInclude(r => r.DonationCenter)
+            .Include(a => a.Donor)
+            .FirstOrDefaultAsync(r => r.Id == id &&
+                r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id);
 
         if (appointment == null) return NotFound();
+
+        var (canDonate, _, reason) = await _donorEligibilityService.CanDonate(appointment.DonorId);
+        if (!canDonate)
+        {
+            TempData["ErrorMessage"] = $"Cannot approve: {reason}";
+            return RedirectToAction(nameof(PendingAppointments));
+        }
 
         appointment.State = AppointmentState.Accepted;
         await _context.SaveChangesAsync();
 
-        await _notificationService.CreateNotification(appointment.Donor.UserId, "Appointment accepted", $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been accepted");
+        await _notificationService.CreateNotification(
+            appointment.Donor.UserId,
+            "Appointment accepted",
+            $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been accepted"
+        );
 
         return RedirectToAction(nameof(PendingAppointments));
     }
