@@ -16,6 +16,7 @@ builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<DonationCenterService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<DonorEligibilityService>();
+builder.Services.AddScoped<DonorStatusService>();
 
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

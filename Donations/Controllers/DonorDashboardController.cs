@@ -249,7 +249,8 @@ public class DonorDashboardController : Controller
                 CenterName = a.BloodRequest.DonationCenter.Name,
                 CenterLocation = a.BloodRequest.DonationCenter.Location.Name,
                 Date = a.BloodRequest.Date,
-                RequestedBloodTypes = a.BloodRequest.BloodTypesString
+                RequestedBloodTypes = string.Join(", ", a.BloodRequest.BloodTypes
+                .Select(bt => bt.ToHumanReadableString()))
             });
 
         return View(viewModel);

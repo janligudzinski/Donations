@@ -1,7 +1,11 @@
 ﻿@using Donations.Entities.Medical
 @using Donations.Entities.User
+@using Donations.Services
 @using Microsoft.AspNetCore.Identity
+@* // "Shared" views like _Layout don't have controllers, so we have to use a special @inject directive to get services and access our database or other application state objects: *@
 @inject UserManager<User> UserManager
+@inject DonorStatusService DonorStatusService
+
 @{
     var currentUser = await UserManager.GetUserAsync(User);
     var currentPath = Context.Request.Path.Value?.ToLower() ?? "";
@@ -12,6 +16,18 @@
     currentPath == "/donordashboard/notifications" ||
     currentPath == "/donordashboard/profileoptions" ||
     currentPath == "/donordashboard/centers";
+    DonorStatusViewModel? donorStatus = null;
+
+    if (currentUser?.Donor != null)
+    {
+        var (nextAppointment, eligibleFrom, isEligible) = await DonorStatusService.GetDonorStatus(currentUser.Donor.Id);
+        donorStatus = new DonorStatusViewModel
+                {
+                    NextAppointment = nextAppointment,
+                    EligibleFrom = eligibleFrom,
+                    IsEligible = isEligible
+                };
+    }
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -57,8 +73,23 @@
                             <i class="fas fa-calendar fa-2x"></i>
                         </div>
                         <div class="text-start">
-                            <div class="fw-bold">@DateTime.Now.ToString("MMM d")</div>
-                            <div class="small">14 days left</div>
+                            @if (donorStatus?.NextAppointment != null)
+                            {
+                                var daysUntilAppointment = (donorStatus.NextAppointment.Value - DateTime.Today).Days;
+                                <div class="fw-bold">Next: @donorStatus.NextAppointment.Value.ToString("MMM d")</div>
+                                <div class="small">@daysUntilAppointment days until appointment</div>
+                            }
+                            else if (!donorStatus?.IsEligible ?? false)
+                            {
+                                <div class="fw-bold text-warning">Not eligible</div>
+                                <div class="small">@((donorStatus?.EligibleFrom?.Subtract(DateTime.Today).Days ?? 0)) days
+                                    remaining</div>
+                            }
+                            else
+                            {
+                                <div class="fw-bold text-white">Eligible to donate</div>
+                                <div class="small">No appointments</div>
+                            }
                         </div>
                     </div>
                 </div>
