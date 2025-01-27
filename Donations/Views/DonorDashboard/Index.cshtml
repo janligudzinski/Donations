@@ -1,71 +1,44 @@
 @using Donations.Entities.Medical
 @model DonorDashboardViewModel
 
-<div class="d-flex flex-column">
-    <div class="bg-danger text-white p-4 mb-4">
-        <div class="row align-items-center">
-            <div class="col-6 d-flex align-items-center">
-                <div class="me-3">
-                    <i class="fas fa-user fa-2x"></i>
-                </div>
-                <div class="text-start">
-                    <div class="fw-bold">@Model.Donor.User.FullName</div>
-                    <div class="small">@Model.Donor.Points points</div>
-                </div>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+                <a href="/DonorDashboard/Urgent" class="text-decoration-none">
+                    <div class="card h-100 hover-shadow text-danger">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center"
+                            style="aspect-ratio: 1;">
+                            <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                            <h3 class="card-title">Urgent</h3>
+                            <p class="card-text text-muted">Critical blood needs</p>
+                        </div>
+                    </div>
+                </a>
             </div>
-            <div class="col-6 d-flex align-items-center">
-                <div class="me-3">
-                    <i class="fas fa-calendar fa-2x"></i>
-                </div>
-                <div class="text-start">
-                    <div class="fw-bold">@DateTime.Now.ToString("MMM d")</div>
-                    <div class="small">14 days left</div>
-                </div>
+            <div class="col">
+                <a href="/DonorDashboard/Available" class="text-decoration-none">
+                    <div class="card h-100 hover-shadow text-danger">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center"
+                            style="aspect-ratio: 1;">
+                            <i class="fas fa-hand-holding-medical fa-3x mb-3"></i>
+                            <h3 class="card-title">Available</h3>
+                            <p class="card-text text-muted">Current requests</p>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    <div class="col">
-                        <a href="/DonorDashboard/Urgent" class="text-decoration-none">
-                            <div class="card h-100 hover-shadow text-danger">
-                                <div class="card-body d-flex flex-column align-items-center justify-content-center"
-                                    style="aspect-ratio: 1;">
-                                    <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
-                                    <h3 class="card-title">Urgent</h3>
-                                    <p class="card-text text-muted">Critical blood needs</p>
-                                </div>
-                            </div>
-                        </a>
+            <div class="col">
+                <a href="/DonorDashboard/Campaigns" class="text-decoration-none">
+                    <div class="card h-100 hover-shadow text-danger">
+                        <div class="card-body d-flex flex-column align-items-center justify-content-center"
+                            style="aspect-ratio: 1;">
+                            <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                            <h3 class="card-title">Campaigns</h3>
+                            <p class="card-text text-muted">Upcoming drives</p>
+                        </div>
                     </div>
-                    <div class="col">
-                        <a href="/DonorDashboard/Available" class="text-decoration-none">
-                            <div class="card h-100 hover-shadow text-danger">
-                                <div class="card-body d-flex flex-column align-items-center justify-content-center"
-                                    style="aspect-ratio: 1;">
-                                    <i class="fas fa-hand-holding-medical fa-3x mb-3"></i>
-                                    <h3 class="card-title">Available</h3>
-                                    <p class="card-text text-muted">Current requests</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col">
-                        <a href="/DonorDashboard/Campaigns" class="text-decoration-none">
-                            <div class="card h-100 hover-shadow text-danger">
-                                <div class="card-body d-flex flex-column align-items-center justify-content-center"
-                                    style="aspect-ratio: 1;">
-                                    <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-                                    <h3 class="card-title">Campaigns</h3>
-                                    <p class="card-text text-muted">Upcoming drives</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>
@@ -96,9 +69,5 @@
 
     .card:hover .text-danger {
         color: white !important;
-    }
-
-    .bg-danger {
-        background-color: #b02a37 !important;
     }
 </style>

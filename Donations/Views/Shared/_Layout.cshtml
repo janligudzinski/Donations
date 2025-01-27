@@ -1,4 +1,9 @@
 ﻿@using Donations.Entities.User
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,8 +22,38 @@
         var isPublicPage = Context.Request.Path.Value?.StartsWith("/Home") == true ||
         Context.Request.Path.Value?.StartsWith("/Login") == true ||
         Context.Request.Path.Value?.StartsWith("/Register") == true;
-        var isDonor = User.IsInRole(Roles.Donor);
-        var isDonationCenter = User.IsInRole(Roles.DonationCenter);
+        var isDonor = User.IsInRole(Roles.Donor) && currentUser?.Donor != null;
+        var isDonationCenter = User.IsInRole(Roles.DonationCenter) && currentUser?.DonationCenter != null;
+        var isDashboard = Context.Request.Path.Value == "/DonorDashboard/Index" ||
+        Context.Request.Path.Value == "/CenterDashboard/Index";
+    }
+
+    @if (isDashboard && isDonor && !isPublicPage)
+    {
+        <div class="bg-danger text-white p-4 mb-4">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-6 d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-user fa-2x"></i>
+                        </div>
+                        <div class="text-start">
+                            <div class="fw-bold">@currentUser!.FullName</div>
+                            <div class="small">@currentUser!.Donor!.Points points</div>
+                        </div>
+                    </div>
+                    <div class="col-6 d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="fas fa-calendar fa-2x"></i>
+                        </div>
+                        <div class="text-start">
+                            <div class="fw-bold">@DateTime.Now.ToString("MMM d")</div>
+                            <div class="small">14 days left</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 
     <div class="container mb-5">
@@ -65,6 +100,12 @@
             </div>
         </nav>
     }
+
+    <style>
+        .bg-danger {
+            background-color: #b02a37 !important;
+        }
+    </style>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
