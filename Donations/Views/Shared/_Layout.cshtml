@@ -1,10 +1,14 @@
-﻿@using Donations.Entities.Medical
+﻿@using Donations.Database
+@using Donations.Entities.Medical
 @using Donations.Entities.User
 @using Donations.Services
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.EntityFrameworkCore
 @* // "Shared" views like _Layout don't have controllers, so we have to use a special @inject directive to get services and access our database or other application state objects: *@
 @inject UserManager<User> UserManager
 @inject DonorStatusService DonorStatusService
+@inject ApplicationDbContext dbContext
 
 @{
     var currentUser = await UserManager.GetUserAsync(User);
@@ -53,48 +57,76 @@
         Context.Request.Path.Value?.StartsWith("/CenterDashboard") == true;
     }
 
-    @if (isDashboard && isDonor && !isPublicPage)
+    @if (isDashboard && !isPublicPage)
     {
-        <div class="bg-danger text-white p-4 mb-4">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-6 d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-user fa-2x"></i>
+        @if (isDonor)
+        {
+            <div class="bg-danger text-white p-4 mb-4">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-6 d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-user fa-2x"></i>
+                            </div>
+                            <div class="text-start">
+                                <div class="fw-bold">@currentUser!.FullName (@currentUser!.Donor!.BloodType.ToHumanReadableString())</div>
+                                <div class="small">@currentUser!.Donor!.Points points</div>
+                            </div>
                         </div>
-                        <div class="text-start">
-                            <div class="fw-bold">@currentUser!.FullName
-                                (@currentUser!.Donor!.BloodType.ToHumanReadableString())</div>
-                            <div class="small">@currentUser!.Donor!.Points points</div>
-                        </div>
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fas fa-calendar fa-2x"></i>
-                        </div>
-                        <div class="text-start">
-                            @if (donorStatus?.NextAppointment != null)
-                            {
-                                var daysUntilAppointment = (donorStatus.NextAppointment.Value - DateTime.Today).Days;
-                                <div class="fw-bold">Next: @donorStatus.NextAppointment.Value.ToString("MMM d")</div>
-                                <div class="small">@daysUntilAppointment days until appointment</div>
-                            }
-                            else if (!donorStatus?.IsEligible ?? false)
-                            {
-                                <div class="fw-bold text-warning">Not eligible</div>
-                                <div class="small">@((donorStatus?.EligibleFrom?.Subtract(DateTime.Today).Days ?? 0)) days
-                                    remaining</div>
-                            }
-                            else
-                            {
-                                <div class="fw-bold text-white">Eligible to donate</div>
-                                <div class="small">No appointments</div>
-                            }
+                        <div class="col-6 d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-calendar fa-2x"></i>
+                            </div>
+                            <div class="text-start">
+                                @if (donorStatus?.NextAppointment != null)
+                                {
+                                    var daysUntilAppointment = (donorStatus.NextAppointment.Value - DateTime.Today).Days;
+                                    <div class="fw-bold">Next: @donorStatus.NextAppointment.Value.ToString("MMM d")</div>
+                                    <div class="small">@daysUntilAppointment days until appointment</div>
+                                }
+                                else if (!donorStatus?.IsEligible ?? false)
+                                {
+                                    <div class="fw-bold text-warning">Not eligible</div>
+                                    <div class="small">@((donorStatus?.EligibleFrom?.Subtract(DateTime.Today).Days ?? 0)) days remaining</div>
+                                }
+                                else
+                                {
+                                    <div class="fw-bold text-white">Eligible to donate</div>
+                                    <div class="small">No appointments</div>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
+        @if (isDonationCenter)
+        {
+            <div class="bg-danger text-white p-2 mb-4">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-6 d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-hospital fa-2x"></i>
+                            </div>
+                            <div class="text-start">
+                                <div class="fw-bold">@currentUser!.DonationCenter!.Name</div>
+                                <div class="small">@currentUser!.DonationCenter!.Location.Name</div>
+                            </div>
+                        </div>
+                        <div class="col-6 d-flex align-items-center justify-content-end">
+                            <div class="me-3">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <div class="text-start">
+                                <div class="fw-bold">@(await dbContext.Donors.CountAsync())</div>
+                                <div class="small">Total Donors</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     }
 
     <div class="container mb-5 pt-3">
@@ -111,8 +143,8 @@
                 @if (isDonationCenter)
                 {
                     <div class="d-flex align-items-center">
-                        <a href="/CenterDashboard/Index"
-                            class="btn btn-link text-danger @(currentPath == "/centerdashboard/index" ? "nav-active" : "")">
+                        <a href="/CenterDashboard/Index" 
+                           class="btn btn-link text-danger @(currentPath.StartsWith("/centerdashboard") && !currentPath.Contains("/pendingrequests") ? "nav-active" : "")">
                             <i class="fas fa-home fa-lg"></i>
                         </a>
                     </div>
