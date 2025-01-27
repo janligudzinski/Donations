@@ -3,6 +3,12 @@
 @inject UserManager<User> UserManager
 @{
     var currentUser = await UserManager.GetUserAsync(User);
+    var currentPath = Context.Request.Path.Value?.ToLower() ?? "";
+    var isTopLevelPage = currentPath == "/donordashboard/index" ||
+    currentPath == "/centerdashboard/index" ||
+    currentPath == "/donordashboard/notifications" ||
+    currentPath == "/donordashboard/profileoptions" ||
+    currentPath == "/donordashboard/centers";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -24,8 +30,8 @@
         Context.Request.Path.Value?.StartsWith("/Register") == true;
         var isDonor = User.IsInRole(Roles.Donor) && currentUser?.Donor != null;
         var isDonationCenter = User.IsInRole(Roles.DonationCenter) && currentUser?.DonationCenter != null;
-        var isDashboard = Context.Request.Path.Value == "/DonorDashboard/Index" ||
-        Context.Request.Path.Value == "/CenterDashboard/Index";
+        var isDashboard = Context.Request.Path.Value?.StartsWith("/DonorDashboard") == true ||
+        Context.Request.Path.Value?.StartsWith("/CenterDashboard") == true;
     }
 
     @if (isDashboard && isDonor && !isPublicPage)
@@ -56,13 +62,13 @@
         </div>
     }
 
-    <div class="container mb-5">
+    <div class="container mb-5 pt-3">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    @if (!isPublicPage)
+    @if (!isPublicPage && isTopLevelPage)
     {
         <nav class="navbar fixed-bottom navbar-light bg-white border-top"
             style="padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
@@ -70,7 +76,8 @@
                 @if (isDonationCenter)
                 {
                     <div class="d-flex align-items-center">
-                        <a href="/CenterDashboard/Index" class="btn btn-link text-danger">
+                        <a href="/CenterDashboard/Index"
+                            class="btn btn-link text-danger @(currentPath == "/centerdashboard/index" ? "nav-active" : "")">
                             <i class="fas fa-home fa-lg"></i>
                         </a>
                     </div>
@@ -83,16 +90,20 @@
                 @if (isDonor)
                 {
                     <div class="d-flex justify-content-around" style="width: 100%; max-width: 400px;">
-                        <a href="/DonorDashboard/Index" class="btn btn-link text-danger">
+                        <a href="/DonorDashboard/Index"
+                            class="btn btn-link text-danger @(currentPath == "/donordashboard/index" ? "nav-active" : "")">
                             <i class="fas fa-home fa-lg"></i>
                         </a>
-                        <a href="/DonorDashboard/Centers" class="btn btn-link text-danger">
+                        <a href="/DonorDashboard/Centers"
+                            class="btn btn-link text-danger @(currentPath == "/donordashboard/centers" ? "nav-active" : "")">
                             <i class="fas fa-map-marker-alt fa-lg"></i>
                         </a>
-                        <a href="/DonorDashboard/Notifications" class="btn btn-link text-danger">
+                        <a href="/DonorDashboard/Notifications"
+                            class="btn btn-link text-danger @(currentPath == "/donordashboard/notifications" ? "nav-active" : "")">
                             <i class="fas fa-bell fa-lg"></i>
                         </a>
-                        <a href="/DonorDashboard/ProfileOptions" class="btn btn-link text-danger">
+                        <a href="/DonorDashboard/ProfileOptions"
+                            class="btn btn-link text-danger @(currentPath == "/donordashboard/profileoptions" ? "nav-active" : "")">
                             <i class="fas fa-user fa-lg"></i>
                         </a>
                     </div>
@@ -104,6 +115,27 @@
     <style>
         .bg-danger {
             background-color: #b02a37 !important;
+        }
+
+        .nav-active {
+            position: relative;
+        }
+
+        .nav-active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #dc3545;
+        }
+
+        .nav-active i {
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
         }
     </style>
 
