@@ -150,4 +150,30 @@ public class DonorDashboardController : Controller
     {
         return View();
     }
+
+    public async Task<IActionResult> Appointments()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var appointments = await _dbContext.Appointments
+            .Include(a => a.BloodRequest)
+                .ThenInclude(r => r.DonationCenter)
+                    .ThenInclude(c => c.Location)
+            .Where(a => a.DonorId == user!.Donor!.Id &&
+                       (a.State == AppointmentState.Pending || a.State == AppointmentState.Accepted) &&
+                       a.BloodRequest.Date >= DateTime.Today)
+            .OrderBy(a => a.BloodRequest.Date)
+            .ToListAsync();
+
+        var viewModel = appointments
+            .Select(a => new AppointmentViewModel
+            {
+                State = a.State,
+                CenterName = a.BloodRequest.DonationCenter.Name,
+                CenterLocation = a.BloodRequest.DonationCenter.Location.Name,
+                Date = a.BloodRequest.Date,
+                RequestedBloodTypes = a.BloodRequest.BloodTypesString
+            });
+
+        return View(viewModel);
+    }
 }
