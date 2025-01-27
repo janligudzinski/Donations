@@ -1,9 +1,10 @@
+@using Donations.Entities.Medical
 @model RegisterViewModel
 
 <div class="text-center d-flex flex-column align-items-center">
     <img src="~/img/logo.png" alt="Logo" class="mb-4" style="max-width: 300px;">
     <h1>Sign up</h1>
-    
+
     @if (Model.ErrorMessage != null)
     {
         <div class="alert alert-danger" role="alert">
@@ -32,14 +33,18 @@
             <input type="password" class="form-control" id="password" name="Password" required>
         </div>
 
-        <div class="form-group mb-3 text-start">
+        <div class="mb-3">
             <label for="bloodType" class="form-label">Blood Type</label>
-            <select class="form-control" id="bloodType" name="BloodType" required>
-                @foreach (var bloodType in Model.BloodTypes)
+            <select id="bloodType" name="BloodType" class="form-select" required>
+                @foreach (var bloodType in Enum.GetValues<BloodType>())
                 {
-                    <option value="@bloodType.Value">@bloodType.Key</option>
+                    <option value="@bloodType">@bloodType.ToHumanReadableString()</option>
                 }
             </select>
+            <div class="form-text text-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                Please select carefully - blood type cannot be changed later.
+            </div>
         </div>
 
         <div class="form-group mb-3 text-start">

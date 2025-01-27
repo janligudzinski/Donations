@@ -141,9 +141,87 @@ public class DonorDashboardController : Controller
         return View();
     }
 
-    public IActionResult EditInformation()
+    public async Task<IActionResult> EditInformation()
     {
-        return View();
+        var user = await _userManager.GetUserAsync(User);
+        var locations = await _dbContext.Locations.OrderBy(l => l.Name).ToListAsync();
+
+        var model = new EditDonorInfoViewModel
+        {
+            FullName = user!.FullName,
+            Email = user.Email!,
+            LocationId = user.Donor!.LocationId,
+            AvailableLocations = locations
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EditInformation(EditDonorInfoViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            model.AvailableLocations = await _dbContext.Locations.OrderBy(l => l.Name).ToListAsync();
+            return View(model);
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        var hasPasswordChange = !string.IsNullOrEmpty(model.CurrentPassword) &&
+                               !string.IsNullOrEmpty(model.NewPassword);
+
+        if (hasPasswordChange)
+        {
+            if (model.NewPassword != model.ConfirmNewPassword)
+            {
+                ModelState.AddModelError("ConfirmNewPassword", "The new passwords do not match");
+                model.AvailableLocations = await _dbContext.Locations.OrderBy(l => l.Name).ToListAsync();
+                return View(model);
+            }
+
+            var passwordCheck = await _userManager.CheckPasswordAsync(user!, model.CurrentPassword!);
+            if (!passwordCheck)
+            {
+                ModelState.AddModelError("CurrentPassword", "Current password is incorrect");
+                model.AvailableLocations = await _dbContext.Locations.OrderBy(l => l.Name).ToListAsync();
+                return View(model);
+            }
+
+            var passwordResult = await _userManager.ChangePasswordAsync(user!, model.CurrentPassword!, model.NewPassword!);
+            if (!passwordResult.Succeeded)
+            {
+                foreach (var error in passwordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                model.AvailableLocations = await _dbContext.Locations.OrderBy(l => l.Name).ToListAsync();
+                return View(model);
+            }
+        }
+
+        // Update basic info
+        user!.FullName = model.FullName;
+        if (user.Email != model.Email)
+        {
+            var emailResult = await _userManager.SetEmailAsync(user, model.Email);
+            if (!emailResult.Succeeded)
+            {
+                foreach (var error in emailResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                model.AvailableLocations = await _dbContext.Locations.OrderBy(l => l.Name).ToListAsync();
+                return View(model);
+            }
+            user.UserName = model.Email; // Keep username in sync with email
+        }
+
+        // Update location
+        user.Donor!.LocationId = model.LocationId;
+        await _dbContext.SaveChangesAsync();
+
+        TempData["SuccessMessage"] = "Your information has been updated successfully.";
+        return RedirectToAction(nameof(EditInformation));
     }
 
     public IActionResult DonationTerms()
