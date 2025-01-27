@@ -105,4 +105,14 @@ public class DonorDashboardController : Controller
             Requests = requests
         });
     }
+
+    public IActionResult Notifications()
+    {
+        return View();
+    }
+
+    public IActionResult ProfileOptions()
+    {
+        return View();
+    }
 }
