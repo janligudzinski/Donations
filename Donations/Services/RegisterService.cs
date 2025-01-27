@@ -20,11 +20,6 @@ public class RegisterService
 
     public async Task<User> RegisterDonor(RegisterFormModel registerFormModel)
     {
-        if (!registerFormModel.Consent)
-        {
-            throw new Exception(
-                "You must consent to the collection of your medical data and attest to your ability to donate.");
-        }
         var createResult = await _userManager.CreateAsync(new User
         {
             FullName = registerFormModel.FullName,
