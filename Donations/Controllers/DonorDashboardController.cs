@@ -115,4 +115,14 @@ public class DonorDashboardController : Controller
     {
         return View();
     }
+
+    public IActionResult EditInformation()
+    {
+        return View();
+    }
+
+    public IActionResult DonationTerms()
+    {
+        return View();
+    }
 }

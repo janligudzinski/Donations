@@ -1,9 +1,34 @@
 <div class="container">
     <h1 class="mb-4">Profile</h1>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">@User.Identity?.Name</h5>
-            <p class="card-text text-muted">Profile settings coming soon.</p>
-        </div>
+
+    <div class="d-flex flex-column gap-3">
+        <a href="/DonorDashboard/EditInformation" class="btn btn-outline-danger btn-lg text-start p-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-user-edit fa-lg me-3"></i>
+                <div>
+                    <div class="fw-bold">Edit Information</div>
+                </div>
+            </div>
+        </a>
+
+        <a href="/DonorDashboard/DonationTerms" class="btn btn-outline-danger btn-lg text-start p-4">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-file-contract fa-lg me-3"></i>
+                <div>
+                    <div class="fw-bold">Review Donation Terms</div>
+                </div>
+            </div>
+        </a>
+
+        <form method="post" action="/Login/Logout">
+            <button type="submit" class="btn btn-outline-danger btn-lg text-start p-4 w-100">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-sign-out-alt fa-lg me-3"></i>
+                    <div>
+                        <div class="fw-bold">Logout</div>
+                    </div>
+                </div>
+            </button>
+        </form>
     </div>
 </div>
