@@ -10,4 +10,5 @@ public class RegisterFormModel
     public string ContactInfo { get; set; }
     public BloodType BloodType { get; set; }
     public Guid LocationId { get; set; }
+    public bool Consent { get; set; }
 }
