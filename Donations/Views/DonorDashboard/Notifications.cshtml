@@ -1,4 +1,47 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<Donations.Entities.User.Notification>
+
 <div class="container">
-    <h1 class="mb-4">Notifications</h1>
-    <p class="text-muted">You have no notifications at this time.</p>
-</div> 
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <a href="/DonorDashboard/Index" class="text-danger text-decoration-none" aria-label="Back to Dashboard">
+                <i class="fas fa-arrow-left fa-lg"></i>
+                <span class="visually-hidden">Back to Dashboard</span>
+            </a>
+            <h1 class="mb-0">Notifications</h1>
+        </div>
+        @if (Model.Any())
+        {
+            <form asp-action="ClearNotifications" method="post">
+                <button type="submit" class="btn btn-outline-danger">
+                    <i class="fas fa-trash-alt me-2"></i>Clear All
+                </button>
+            </form>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center text-muted">
+            <p>No notifications at this time.</p>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column gap-3">
+            @foreach (var notification in Model)
+            {
+                <div class="card @(!notification.IsRead ? "bg-danger bg-opacity-10" : "")">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <span class="bell-icon"><i class="fas fa-bell"></i></span>
+                            @notification.Title
+                        </h5>
+                        <p class="card-text">@notification.Message</p>
+                        <small class="text-muted">@notification.Date.ToShortDateString()</small>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

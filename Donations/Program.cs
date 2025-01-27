@@ -14,6 +14,7 @@ builder.Services.AddScoped<LocationService>();
 builder.Services.AddScoped<SeedingService>();
 builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<DonationCenterService>();
+builder.Services.AddScoped<NotificationService>();
 
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -30,7 +31,7 @@ builder.Services.AddIdentity<User, Role>(options =>
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 8;
-    
+
     options.User.RequireUniqueEmail = true;
     // We're not going to implement email or text confirmation for new accounts
     options.SignIn.RequireConfirmedAccount = false;

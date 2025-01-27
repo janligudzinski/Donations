@@ -17,12 +17,14 @@ public class DonorDashboardController : Controller
     private readonly UserManager<User> _userManager;
     private readonly ApplicationDbContext _dbContext;
     private readonly DonationCenterService _donationCenterService;
+    private readonly NotificationService _notificationService;
 
-    public DonorDashboardController(UserManager<User> userManager, ApplicationDbContext dbContext, DonationCenterService donationCenterService)
+    public DonorDashboardController(UserManager<User> userManager, ApplicationDbContext dbContext, DonationCenterService donationCenterService, NotificationService notificationService)
     {
         _userManager = userManager;
         _dbContext = dbContext;
         _donationCenterService = donationCenterService;
+        _notificationService = notificationService;
     }
 
     public async Task<IActionResult> Index()
@@ -106,9 +108,32 @@ public class DonorDashboardController : Controller
         });
     }
 
-    public IActionResult Notifications()
+    public async Task<IActionResult> Notifications()
     {
-        return View();
+        var user = await _userManager.GetUserAsync(User);
+        var notifications = await _notificationService.GetUserNotifications(user!.Id);
+
+        // Mark as read after getting them
+        await _notificationService.MarkAllAsRead(user.Id);
+
+        return View(notifications);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ClearNotifications()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        await _notificationService.ClearAll(user.Id);
+        return RedirectToAction(nameof(Notifications));
+    }
+
+    // Add this to get unread count for the layout
+    [HttpGet]
+    public async Task<JsonResult> UnreadNotificationCount()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var count = await _notificationService.GetUnreadCount(user.Id);
+        return Json(count);
     }
 
     public IActionResult ProfileOptions()

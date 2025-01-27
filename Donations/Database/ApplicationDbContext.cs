@@ -15,7 +15,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public DbSet<Location> Locations { get; set; }
     public DbSet<BloodRequest> BloodRequests { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
-
+    public DbSet<Notification> Notifications { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
@@ -53,13 +53,13 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
         modelBuilder.Entity<BloodRequest>()
             .Property(br => br.BloodTypesString)
             .HasColumnName("BloodTypes"); // this is to keep the column name meaningful instead of an ugly BloodTypesString (a technical detail we don't need to leak)
-        
+
         modelBuilder.Entity<Donor>()
             .HasMany(br => br.Appointments)
             .WithOne(a => a.Donor)
             .HasForeignKey(a => a.DonorId)
             .OnDelete(DeleteBehavior.NoAction); // delete appointments when the request is deleted
-            
+
         #endregion
     }
 }
