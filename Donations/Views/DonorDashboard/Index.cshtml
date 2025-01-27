@@ -1,12 +1,31 @@
 @using Donations.Entities.Medical
 @model DonorDashboardViewModel
 
-<div class="text-center d-flex flex-column align-items-center">
-    <h1>Welcome @Model.Donor.User.FullName</h1>
-    <p>You're a donor from @Model.Donor.Location.Name, of blood type @Model.Donor.BloodType.ToHumanReadableString().</p>
-    <p>You have earned <b>@Model.Donor.Points</b> points for your donations so far.</p>
+<div class="d-flex flex-column">
+    <div class="bg-danger text-white p-4 mb-4">
+        <div class="row align-items-center">
+            <div class="col-6 d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-user fa-2x"></i>
+                </div>
+                <div class="text-start">
+                    <div class="fw-bold">@Model.Donor.User.FullName</div>
+                    <div class="small">@Model.Donor.Points points</div>
+                </div>
+            </div>
+            <div class="col-6 d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-calendar fa-2x"></i>
+                </div>
+                <div class="text-start">
+                    <div class="fw-bold">@DateTime.Now.ToString("MMM d")</div>
+                    <div class="small">14 days left</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="container mt-4">
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-10">
                 <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -77,5 +96,9 @@
 
     .card:hover .text-danger {
         color: white !important;
+    }
+
+    .bg-danger {
+        background-color: #b02a37 !important;
     }
 </style>
