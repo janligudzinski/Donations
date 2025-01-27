@@ -64,12 +64,12 @@ public class CenterDashboardController : Controller
         var currentUser = await _userManager.GetUserAsync(User);
         if (currentUser == null) return Challenge();
 
-        var pendingRequests = await _context.Appointments
+        var appointments = await _context.Appointments
             .Include(r => r.Donor)
                 .ThenInclude(d => d.Location)
             .Include(r => r.BloodRequest)
             .Where(r => r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id
-                    && r.State == AppointmentState.Pending)
+                    && (r.State == AppointmentState.Pending || r.State == AppointmentState.Accepted))
             .Select(r => new PendingAppointmentViewModel
             {
                 AppointmentId = r.Id,
@@ -77,11 +77,14 @@ public class CenterDashboardController : Controller
                 DonorLocation = r.Donor.Location.Name,
                 DonorBloodType = r.Donor.BloodType.ToHumanReadableString(),
                 RequestedBloodTypes = r.BloodRequest.BloodTypesString,
-                RequestDate = r.BloodRequest.Date
+                RequestDate = r.BloodRequest.Date,
+                State = r.State,
+                UrgencyLevel = r.BloodRequest.UrgencyLevel
             })
+            .OrderBy(r => r.RequestDate)
             .ToListAsync();
 
-        return View(pendingRequests);
+        return View(appointments);
     }
 
     [HttpPost]
@@ -122,6 +125,49 @@ public class CenterDashboardController : Controller
         await _context.SaveChangesAsync();
 
         await _notificationService.CreateNotification(appointment.Donor.UserId, "Appointment rejected", $"Your appointment with {appointment.BloodRequest.DonationCenter.Name} on {appointment.BloodRequest.Date.ToShortDateString()} has been declined");
+
+        return RedirectToAction(nameof(PendingAppointments));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CompleteAppointment(Guid id)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null) return Challenge();
+
+        var appointment = await _context.Appointments
+            .Include(a => a.BloodRequest)
+                .ThenInclude(r => r.DonationCenter)
+            .Include(a => a.Donor)
+            .FirstOrDefaultAsync(r => r.Id == id &&
+                r.BloodRequest.DonationCenterId == currentUser.DonationCenter!.Id &&
+                r.State == AppointmentState.Accepted);
+
+        if (appointment == null) return NotFound();
+
+        // Calculate points based on urgency
+        int basePoints = 100;
+        double multiplier = appointment.BloodRequest.UrgencyLevel switch
+        {
+            UrgencyLevel.Urgent => 2.0,
+            UrgencyLevel.Campaign => 1.5,
+            UrgencyLevel.Normal => 1.0,
+            _ => 1.0
+        };
+        int pointsEarned = (int)(basePoints * multiplier);
+
+        // Update appointment and donor
+        appointment.State = AppointmentState.Complete;
+        appointment.Donor.Points += pointsEarned;
+        await _context.SaveChangesAsync();
+
+        // Notify the donor
+        await _notificationService.CreateNotification(
+            appointment.Donor.UserId,
+            "Donation Completed - Thank You!",
+            $"Thank you for your donation at {appointment.BloodRequest.DonationCenter.Name}! " +
+            $"You've earned {pointsEarned} points for this {appointment.BloodRequest.UrgencyLevel.ToString().ToLower()} donation."
+        );
 
         return RedirectToAction(nameof(PendingAppointments));
     }
