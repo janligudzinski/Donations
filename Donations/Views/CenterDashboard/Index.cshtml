@@ -1,4 +1,40 @@
+@using Donations.Entities.Medical
 @model CenterDashboardViewModel
+
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-4">Blood Supply Status</h5>
+        <div class="row g-3">
+            @foreach (var supply in Model.DonationCenter.BloodSupplies.OrderBy(s => s.BloodType))
+            {
+                @if (supply.DesiredMilliliters > 0)
+                {
+                    var percentage = Math.Min(100, (supply.MillilitersInStock * 100) / supply.DesiredMilliliters);
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="text-nowrap">@supply.BloodType.ToHumanReadableString()</span>
+                            <div class="progress flex-grow-1" style="height: 20px;">
+                                <div class="progress-bar @(percentage < 50 ? "bg-danger" : "bg-success")" role="progressbar"
+                                    style="width: @percentage%" aria-valuenow="@percentage" aria-valuemin="0"
+                                    aria-valuemax="100">
+                                </div>
+                            </div>
+                            <span class="text-nowrap fw-bold">@percentage%</span>
+                        </div>
+                    </div>
+                }
+            }
+            @if (!Model.DonationCenter.BloodSupplies.Any(s => s.DesiredMilliliters > 0))
+            {
+                <div class="col-12 text-center text-muted">
+                    <p>No blood supplies needed at the moment.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
 <div class="row g-4">
     <div class="col-md-6">
