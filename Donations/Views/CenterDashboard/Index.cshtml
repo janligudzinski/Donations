@@ -1,15 +1,46 @@
 @model CenterDashboardViewModel
 
-<div class="text-center d-flex flex-column align-items-center">
-    <h1>Welcome @Model.DonationCenter.Name - @Model.DonationCenter.Location.Name</h1>
-    <h2>Dashboard</h2>
-
-    <div class="d-flex flex-column gap-3">
-        <a href="/CenterDashboard/AddRequest" class="btn btn-danger btn-lg">
-            <i class="fas fa-plus-circle me-2"></i>Add request
+<div class="row g-4">
+    <div class="col-md-6">
+        <a href="/CenterDashboard/AddRequest" class="text-decoration-none">
+            <div class="card h-100 border-danger hover-shadow">
+                <div class="card-body d-flex align-items-center gap-3 p-4">
+                    <div class="text-danger">
+                        <i class="fas fa-plus-circle fa-3x"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title mb-1 text-danger">New Blood Request</h5>
+                        <p class="card-text text-muted mb-0">Create a request for blood donations</p>
+                    </div>
+                </div>
+            </div>
         </a>
-        <a href="/CenterDashboard/PendingAppointments" class="btn btn-danger btn-lg">
-            <i class="fas fa-clock me-2"></i>Manage appointments
+    </div>
+
+    <div class="col-md-6">
+        <a href="/CenterDashboard/PendingAppointments" class="text-decoration-none">
+            <div class="card h-100 border-danger hover-shadow">
+                <div class="card-body d-flex align-items-center gap-3 p-4">
+                    <div class="text-danger">
+                        <i class="fas fa-calendar-check fa-3x"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title mb-1 text-danger">Manage Appointments</h5>
+                        <p class="card-text text-muted mb-0">View and handle donation appointments</p>
+                    </div>
+                </div>
+            </div>
         </a>
     </div>
 </div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .hover-shadow:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>
