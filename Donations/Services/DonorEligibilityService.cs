@@ -22,8 +22,8 @@ namespace Donations.Services
         {
             var latestAppointment = await _context.Appointments
                 .Where(a => a.DonorId == donorId &&
-                           (a.State == AppointmentState.Accepted || a.State == AppointmentState.Complete))
-                .OrderByDescending(a => a.BloodRequest.Date)
+                            (a.State == AppointmentState.Accepted || a.State == AppointmentState.Complete))
+                .OrderByDescending(a => a.BloodRequest.Date).Include(appointment => appointment.BloodRequest)
                 .FirstOrDefaultAsync();
 
             if (latestAppointment == null)
